@@ -116,6 +116,7 @@ public class Chess {
                 continue;
             }
 
+            // checking pinned piece moved or not ? 
             try {
                 if (this.turn == COLORS.WHITE) {
                     this.blackAttacking = Attacking.getAllAttackingPositions(board, COLORS.BLACK);
