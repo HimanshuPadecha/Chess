@@ -30,6 +30,7 @@ public class Attacking {
         return attacking;
     }
 
+
     public List<Positon> rook(Board board, Positon positon) {
         Piece rook = board.getPiece(positon);
 

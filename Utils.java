@@ -1,8 +1,11 @@
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+
+import javax.swing.text.AttributeSet.ColorAttribute;
 
 public class Utils {
 
@@ -254,7 +257,8 @@ public class Utils {
         return validMoves;
     }
 
-    public static boolean isCheckmate(Board board, COLORS color, Positon kingPositon) throws InvalidPosition {
+    public static boolean isChekmate(Board board, COLORS color, Positon kingPositon)
+            throws InvalidPosition, IllegalMove {
         // find the piece that have given chek
 
         if (board.getPiece(kingPositon) == null || board.getPiece(kingPositon).getName() != PIECES.KING
@@ -278,41 +282,32 @@ public class Utils {
         Positon checkFrom = checkingPositions.get(0);
 
         if (checkingPositions.size() == 1) {
+
             if (board.getPiece(checkFrom).getName() == PIECES.PAWN
                     || board.getPiece(checkFrom).getName() == PIECES.KNIGHT && kingValidPositons.isEmpty()
                             && !currentAttackings.contains(checkFrom)) {
                 return true;
+
             } else if (board.getPiece(checkFrom).getName() == PIECES.ROOK) {
                 List<Positon> path = Utils.rookChekPath(board, checkFrom, kingPositon);
 
-                boolean canAnyPieceComeInBetween = false;
-                for (Positon positon : path) {
-                    if (currentAttackings.contains(positon)) {
-                        canAnyPieceComeInBetween = true;
-                        break;
-                    }
-                }
+                List<Positon> piecesToComeBetween = Utils.piecesToComeBetween(board, kingPositon, path, color);
 
-                if (!canAnyPieceComeInBetween && !currentAttackings.contains(checkFrom)
+                if (piecesToComeBetween.isEmpty() && !currentAttackings.contains(checkFrom)
                         && kingValidPositons.isEmpty()) {
-                    return !canAnyPieceComeInBetween;
+                    return true;
                 }
             } else if (board.getPiece(checkFrom).getName() == PIECES.BISHOP) {
                 List<Positon> path = Utils.bishopChekPath(board, checkFrom, kingPositon);
 
-                boolean canAnyPieceComeInBetween = false;
-                for (Positon positon : path) {
-                    if (currentAttackings.contains(positon)) {
-                        canAnyPieceComeInBetween = true;
-                        break;
-                    }
-                }
+                List<Positon> piecesToComeBetween = Utils.piecesToComeBetween(board, kingPositon, path, color);
 
-                if (!canAnyPieceComeInBetween && !currentAttackings.contains(checkFrom)
+                if (piecesToComeBetween.isEmpty() && !currentAttackings.contains(checkFrom)
                         && kingValidPositons.isEmpty()) {
-                    return !canAnyPieceComeInBetween;
+                    return true;
                 }
             } else if (board.getPiece(checkFrom).getName() == PIECES.QUEEN) {
+
                 List<Positon> validBishopMoves = Utils.validBishopMoves(checkFrom);
                 List<Positon> path;
 
@@ -322,17 +317,11 @@ public class Utils {
                     path = Utils.rookChekPath(board, checkFrom, kingPositon);
                 }
 
-                boolean canAnyPieceComeInBetween = false;
-                for (Positon positon : path) {
-                    if (currentAttackings.contains(positon)) {
-                        canAnyPieceComeInBetween = true;
-                        break;
-                    }
-                }
+                List<Positon> piecesToComeBetween = Utils.piecesToComeBetween(board, kingPositon, path, color);
 
-                if (!canAnyPieceComeInBetween && !currentAttackings.contains(checkFrom)
+                if (piecesToComeBetween.isEmpty() && !currentAttackings.contains(checkFrom)
                         && kingValidPositons.isEmpty()) {
-                    return !canAnyPieceComeInBetween;
+                    return true;
                 }
             }
         } else {
@@ -501,5 +490,155 @@ public class Utils {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    // when in chek This function returns the pieces that can come between and
+    // remove the chek
+    public static List<Positon> piecesToComeBetween(Board board, Positon kingPositon,
+            List<Positon> chekPath, COLORS color) throws InvalidPosition, IllegalMove {
+
+        List<Positon> positons = new ArrayList<>();
+        Attacking attacking = new Attacking();
+
+        Map<Integer, List<Square>> innerMap = board.getMap();
+
+        for (Map.Entry<Integer, List<Square>> rank : innerMap.entrySet()) {
+            List<Square> currentRank = rank.getValue();
+
+            for (int i = 0; i < currentRank.size(); i++) {
+                Piece currentPiece = currentRank.get(i).getPiece();
+
+                if (currentPiece != null && currentPiece.getColor() == color) {
+                    if (currentPiece.getName() == PIECES.PAWN) {
+
+                        ValidateMoves validateMoves = new ValidateMoves();
+                        List<Positon> pawnPositons = validateMoves.pawn(board, new Positon(rank.getKey(), i));
+
+                        boolean canComeBetween = false;
+                        Positon pawnPositon = null;
+
+                        for (Positon positon : pawnPositons) {
+                            if (chekPath.contains(positon)) {
+                                canComeBetween = true;
+                                pawnPositon = positon;
+                                break;
+                            }
+                        }
+
+                        if (canComeBetween) {
+                            board.move(board, new Positon(rank.getKey(), i), pawnPositon);
+                            Set<Positon> opponentAttacking = Attacking.getAllAttackingPositions(board,
+                                    color == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+
+                            if (!opponentAttacking.contains(kingPositon)) {
+                                positons.add(new Positon(rank.getKey(), i));
+                            }
+
+                            board.informalMove(pawnPositon, new Positon(rank.getKey(), i));
+                        }
+
+                    } else if (currentPiece.getName() == PIECES.ROOK) {
+                        List<Positon> rookAttacking = attacking.rook(board, new Positon(rank.getKey(), i));
+
+                        boolean canComeBetween = false;
+                        Positon rookPositon = null;
+
+                        for (Positon positon : rookAttacking) {
+                            if (chekPath.contains(positon)) {
+                                canComeBetween = true;
+                                rookPositon = positon;
+                                break;
+                            }
+                        }
+
+                        if (canComeBetween) {
+                            board.move(board, new Positon(rank.getKey(), i), rookPositon);
+                            Set<Positon> opponentAttacking = Attacking.getAllAttackingPositions(board,
+                                    color == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+
+                            if (!opponentAttacking.contains(kingPositon)) {
+                                positons.add(new Positon(rank.getKey(), i));
+                            }
+
+                            board.informalMove(rookPositon, new Positon(rank.getKey(), i));
+                        }
+                    } else if (currentPiece.getName() == PIECES.BISHOP) {
+                        List<Positon> bishopAttacking = attacking.bishop(board, new Positon(rank.getKey(), i));
+                        boolean canComeBetween = false;
+                        Positon bishopPositon = null;
+
+                        for (Positon positon : bishopAttacking) {
+                            if (chekPath.contains(positon)) {
+                                canComeBetween = true;
+                                bishopPositon = positon;
+                                break;
+                            }
+                        }
+
+                        if (canComeBetween) {
+                            board.move(board, new Positon(rank.getKey(), i), bishopPositon);
+                            Set<Positon> opponentAttacking = Attacking.getAllAttackingPositions(board,
+                                    color == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+
+                            if (!opponentAttacking.contains(kingPositon)) {
+                                positons.add(new Positon(rank.getKey(), i));
+                            }
+
+                            board.informalMove(bishopPositon, new Positon(rank.getKey(), i));
+                        }
+                    } else if (currentPiece.getName() == PIECES.KNIGHT) {
+                        List<Positon> knightPositons = attacking.knight(board, new Positon(rank.getKey(), i));
+                        boolean canComeBetween = false;
+                        Positon knightPositon = null;
+
+                        for (Positon positon : knightPositons) {
+                            if (chekPath.contains(positon)) {
+                                canComeBetween = true;
+                                knightPositon = positon;
+                                break;
+                            }
+                        }
+
+                        if (canComeBetween) {
+                            board.move(board, new Positon(rank.getKey(), i), knightPositon);
+                            Set<Positon> opponentAttacking = Attacking.getAllAttackingPositions(board,
+                                    color == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+
+                            if (!opponentAttacking.contains(kingPositon)) {
+                                positons.add(new Positon(rank.getKey(), i));
+                            }
+
+                            board.informalMove(knightPositon, new Positon(rank.getKey(), i));
+                        }
+                    } else if (currentPiece.getName() == PIECES.QUEEN) {
+                        List<Positon> queenPositons = attacking.queen(board, new Positon(rank.getKey(), i));
+                        boolean canComeBetween = false;
+                        Positon queenPositon = null;
+
+                        for (Positon positon : queenPositons) {
+                            if (chekPath.contains(positon)) {
+                                canComeBetween = true;
+                                queenPositon = positon;
+                                break;
+                            }
+                        }
+
+                        if (canComeBetween) {
+                            board.move(board, new Positon(rank.getKey(), i), queenPositon);
+                            Set<Positon> opponentAttacking = Attacking.getAllAttackingPositions(board,
+                                    color == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+
+                            if (!opponentAttacking.contains(kingPositon)) {
+                                positons.add(new Positon(rank.getKey(), i));
+                            }
+
+                            board.informalMove(queenPositon, new Positon(rank.getKey(), i));
+                        }
+                    }
+                }
+            }
+        }
+
+        return positons;
     }
 }

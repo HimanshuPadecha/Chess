@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -6,7 +7,7 @@ public class ValidateMoves {
     public void pawn(Board board, Positon from, Positon to) throws IllegalMove {
         Piece pawn = board.getPiece(from);
 
-        if (pawn.getName() != PIECES.PAWN) {
+        if (pawn == null || pawn.getName() != PIECES.PAWN) {
             System.out.println("Not a pawn");
             return;
         }
@@ -81,6 +82,69 @@ public class ValidateMoves {
                 && board.getPiece(new Positon(from.getRank(), to.getIndex())).getName() == PIECES.PAWN) {
             board.getMap().get(from.getRank()).get(to.getIndex()).setPiece(null);// done
         }
+    }
+
+    // This function will return all the valid moves of the pawn
+    public List<Positon> pawn(Board board, Positon positon) {
+
+        Piece pawn = board.getPiece(positon);
+        List<Positon> validMoves = new ArrayList<>();
+
+        if (pawn == null || pawn.getName() != PIECES.PAWN) {
+            System.out.println("Not a pawn");
+            return validMoves;
+        }
+
+        // try + 1, + 2, and captures and en passent
+
+        try {
+            this.pawn(board, positon,
+                    new Positon(pawn.getColor() == COLORS.WHITE ? positon.getRank() + 1 : positon.getRank() - 1,
+                            positon.getIndex()));
+            validMoves.add(
+                    new Positon(pawn.getColor() == COLORS.WHITE ? positon.getRank() + 1 : positon.getRank() - 1,
+                            positon.getIndex()));
+        } catch (Exception e) {
+            // System.out.println(e.getMessage());
+        }
+        try {
+            this.pawn(board, positon,
+                    new Positon(pawn.getColor() == COLORS.WHITE ? positon.getRank() + 2 : positon.getRank() - 2,
+                            positon.getIndex()));
+            validMoves.add(
+                    new Positon(pawn.getColor() == COLORS.WHITE ? positon.getRank() + 2 : positon.getRank() - 2,
+                            positon.getIndex()));
+        } catch (Exception e) {
+            // System.out.println(e.getMessage());
+        }
+        try {
+
+            // left side move
+            if (positon.getIndex() > 0) {
+                Positon left = new Positon(
+                        pawn.getColor() == COLORS.WHITE ? positon.getRank() + 1 : positon.getRank() - 1,
+                        positon.getIndex() - 1);
+                this.pawn(board, positon, left);
+                validMoves.add(left);
+            }
+        } catch (Exception e) {
+            // System.out.println(e.getMessage());
+        }
+
+        try {
+            // right side move
+            if (positon.getIndex() < Board.CHESS_CONSTANT - 1) {
+                Positon right = new Positon(
+                        pawn.getColor() == COLORS.WHITE ? positon.getRank() + 1 : positon.getRank() - 1,
+                        positon.getIndex() + 1);
+                this.pawn(board,positon, right);
+                validMoves.add(right);
+            }
+        } catch (Exception e) {
+            // System.out.println(e.getMessage());
+        }
+
+        return validMoves;
     }
 
     // public void pawn(Board board, Positon from, Positon to) throws IllegalMove {
