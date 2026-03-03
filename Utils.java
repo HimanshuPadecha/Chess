@@ -270,13 +270,10 @@ public class Utils {
         List<Positon> checkingPositions = Utils.getChekingPieces(board, color, kingPositon);
         List<Positon> kingValidPositons = Utils.validKingMoves(board, kingPositon);
 
-        System.out.println(kingValidPositons);
-
         Set<Positon> currentAttackings = color == COLORS.WHITE ? attackingInfo.whiteAttacking
                 : attackingInfo.blackAttacking;
 
         if (checkingPositions.isEmpty()) {
-            System.out.println("King is not in chek !!");
             return false;
         }
 

@@ -2,8 +2,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import javax.swing.text.AttributeSet.ColorAttribute;
-
 public class Chess {
     private Board board;
     private boolean gameOver;
@@ -71,11 +69,35 @@ public class Chess {
 
             if (this.turn == COLORS.WHITE) {
                 if (this.blackAttacking.contains(this.whiteKingPosition)) {
+                    try {
+                        this.gameOver = Utils.isChekmate(board, turn, this.whiteKingPosition,
+                                new AttackingInfo(this.whiteAttacking, this.blackAttacking));
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        continue;
+                    }
+
+                    if(this.gameOver){
+                        System.out.println("Black Won !!");
+                        break;
+                    }
                     this.isWhiteKingInCheck = true;
                     System.out.println("It is a chek !! Do something about it !!");
                 }
             } else {
                 if (this.whiteAttacking.contains(this.blackKingPositon)) {
+                    try {
+                        this.gameOver = Utils.isChekmate(board, turn, this.blackKingPositon,
+                                new AttackingInfo(this.whiteAttacking, this.blackAttacking));
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        continue;
+                    }
+
+                    if(this.gameOver){
+                        System.out.println("White Won !!");
+                        break;
+                    }
                     this.isBlackKingInCheck = true;
                     System.out.println("it is a chek !! Do something about it !!");
                 }
@@ -189,18 +211,6 @@ public class Chess {
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 continue;
-            }
-
-            try {
-                gameOver = Utils.isChekmate(board, turn == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE,
-                        turn == COLORS.WHITE ? this.blackKingPositon : this.whiteKingPosition,
-                        new AttackingInfo(this.whiteAttacking, this.blackAttacking));
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-
-            if (gameOver) {
-                System.out.println((turn == COLORS.WHITE ? "Black " : "White ") + "Won !!");
             }
 
             this.turn = this.turn == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
