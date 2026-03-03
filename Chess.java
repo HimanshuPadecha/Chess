@@ -2,6 +2,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import javax.swing.text.AttributeSet.ColorAttribute;
+
 public class Chess {
     private Board board;
     private boolean gameOver;
@@ -29,8 +31,13 @@ public class Chess {
         this.scanner = new Scanner(System.in);
         this.turn = COLORS.WHITE;
         this.gameOver = false;
-        this.whiteAttacking = Attacking.getAllAttackingPositions(board, COLORS.WHITE);
-        this.blackAttacking = Attacking.getAllAttackingPositions(board, COLORS.BLACK);
+        // this.whiteAttacking = Attacking.getAllAttackingPositions(board,
+        // COLORS.WHITE);
+        // this.blackAttacking = Attacking.getAllAttackingPositions(board,
+        // COLORS.BLACK);
+        AttackingInfo attackingInfo = Attacking.getAllAttackingPositions(board);
+        this.whiteAttacking = attackingInfo.whiteAttacking;
+        this.blackAttacking = attackingInfo.blackAttacking;
         this.whiteKingPosition = Utils.convert("e1");
         this.blackKingPositon = Utils.convert("e8");
         this.isWhiteKingInCheck = false;
@@ -116,24 +123,33 @@ public class Chess {
                 continue;
             }
 
-            // checking pinned piece moved or not ? 
+            Set<Positon> tempWhiteAttacking = this.whiteAttacking;
+            Set<Positon> tempBlackAttakcing = this.blackAttacking;
+
+            // after a move is done on board directly refreshing the attacking of both
+            try {
+                AttackingInfo attackingInfo = Attacking.getAllAttackingPositions(board);
+                this.whiteAttacking = attackingInfo.whiteAttacking;
+                this.blackAttacking = attackingInfo.blackAttacking;
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+
+            // checking pinned piece moved or not ?
             try {
                 if (this.turn == COLORS.WHITE) {
-                    this.blackAttacking = Attacking.getAllAttackingPositions(board, COLORS.BLACK);
-
                     if (this.blackAttacking.contains(this.whiteKingPosition)) {
-                        System.out.println("Cannot move pinned piece !!");
+                        System.out.println("Illegal move !!");
                         board.informalMove(next, current);
-                        this.blackAttacking = Attacking.getAllAttackingPositions(board, COLORS.BLACK);
+                        this.blackAttacking = tempBlackAttakcing;
                         continue;
                     }
                 } else {
-                    this.whiteAttacking = Attacking.getAllAttackingPositions(board, COLORS.WHITE);
 
                     if (this.whiteAttacking.contains(this.blackKingPositon)) {
-                        System.out.println("Cannot move pinned piece !!");
+                        System.out.println("Illegal move !!");
                         board.informalMove(next, current);
-                        this.whiteAttacking = Attacking.getAllAttackingPositions(board, COLORS.WHITE);
+                        this.whiteAttacking = tempWhiteAttacking;
                         continue;
                     }
                 }
@@ -153,9 +169,7 @@ public class Chess {
             try {
                 if (this.turn == COLORS.WHITE && this.isWhiteKingInCheck) {
 
-                    this.blackAttacking = Attacking.getAllAttackingPositions(board, COLORS.BLACK);
-
-                    if (this.blackAttacking.contains(whiteKingPosition)) {
+                    if (this.blackAttacking.contains(this.whiteKingPosition)) {
                         board.informalMove(next, current);
                         System.out.println("Illegal Move !!");
                         continue;
@@ -164,9 +178,7 @@ public class Chess {
                     }
                 } else if (this.turn == COLORS.BLACK && this.isBlackKingInCheck) {
 
-                    this.whiteAttacking = Attacking.getAllAttackingPositions(board, COLORS.WHITE);
-
-                    if (this.whiteAttacking.contains(blackKingPositon)) {
+                    if (this.whiteAttacking.contains(this.blackKingPositon)) {
                         board.informalMove(next, current);
                         System.out.println("Illegal Move !!");
                         continue;
@@ -180,14 +192,15 @@ public class Chess {
             }
 
             try {
-                if (this.turn == COLORS.WHITE) {
-                    this.whiteAttacking = Attacking.getAllAttackingPositions(board, this.turn);
-                } else {
-                    this.blackAttacking = Attacking.getAllAttackingPositions(board, this.turn);
-                }
+                gameOver = Utils.isChekmate(board, turn == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE,
+                        turn == COLORS.WHITE ? this.blackKingPositon : this.whiteKingPosition,
+                        new AttackingInfo(this.whiteAttacking, this.blackAttacking));
             } catch (Exception e) {
                 System.out.println(e.getMessage());
-                continue;
+            }
+
+            if (gameOver) {
+                System.out.println((turn == COLORS.WHITE ? "Black " : "White ") + "Won !!");
             }
 
             this.turn = this.turn == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;

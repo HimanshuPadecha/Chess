@@ -30,7 +30,6 @@ public class Attacking {
         return attacking;
     }
 
-
     public List<Positon> rook(Board board, Positon positon) {
         Piece rook = board.getPiece(positon);
 
@@ -215,14 +214,97 @@ public class Attacking {
             return new ArrayList<>();
         }
 
-        return Utils.validKingMoves(board, positon);
+        List<Positon> attacking = new ArrayList<>();
+
+        if (positon.getRank() < Board.CHESS_CONSTANT && positon.getIndex() > 0) {
+            attacking.add(new Positon(positon.getRank() + 1, positon.getIndex() - 1));
+        }
+
+        if (positon.getRank() < Board.CHESS_CONSTANT) {
+            attacking.add(new Positon(positon.getRank() + 1, positon.getIndex()));
+        }
+
+        if (positon.getRank() < Board.CHESS_CONSTANT && positon.getIndex() < Board.CHESS_CONSTANT - 1) {
+            attacking.add(new Positon(positon.getRank() + 1, positon.getIndex() + 1));
+        }
+
+        if (positon.getIndex() < Board.CHESS_CONSTANT - 1) {
+            attacking.add(new Positon(positon.getRank(), positon.getIndex() + 1));
+        }
+
+        if (positon.getRank() > 1 && positon.getIndex() < Board.CHESS_CONSTANT - 1) {
+            attacking.add(new Positon(positon.getRank() - 1, positon.getIndex() + 1));
+        }
+
+        if (positon.getRank() > 1) {
+            attacking.add(new Positon(positon.getRank() - 1, positon.getIndex()));
+        }
+
+        if (positon.getRank() > 1 && positon.getIndex() > 0) {
+            attacking.add(new Positon(positon.getRank() - 1, positon.getIndex() - 1));
+        }
+
+        if (positon.getIndex() > 0) {
+            attacking.add(new Positon(positon.getRank(), positon.getIndex() - 1));
+        }
+
+        return attacking;
+        
     }
 
-    public static Set<Positon> getAllAttackingPositions(Board board, COLORS color) throws InvalidPosition {
+    // public static Set<Positon> getAllAttackingPositions(Board board, COLORS
+    // color) throws InvalidPosition {
+
+    // Attacking attacking = new Attacking();
+
+    // Set<Positon> allPositons = new HashSet<>();
+
+    // for (Map.Entry<Integer, List<Square>> rank : board.getMap().entrySet()) {
+
+    // List<Square> currentRank = rank.getValue();
+
+    // for (int i = 0; i < currentRank.size(); i++) {
+    // Piece currentPiece = currentRank.get(i).getPiece();
+    // System.out.println(new Positon(rank.getKey(), i));
+
+    // if (currentPiece != null && currentPiece.getColor() == color) {
+
+    // if (currentPiece.getName() == PIECES.PAWN) {
+
+    // allPositons.addAll(attacking.pawn(board, new Positon(rank.getKey(), i)));
+
+    // } else if (currentPiece.getName() == PIECES.ROOK) {
+
+    // allPositons.addAll(attacking.rook(board, new Positon(rank.getKey(), i)));
+
+    // } else if (currentPiece.getName() == PIECES.KNIGHT) {
+
+    // allPositons.addAll(attacking.knight(board, new Positon(rank.getKey(), i)));
+
+    // } else if (currentPiece.getName() == PIECES.BISHOP) {
+
+    // allPositons.addAll(attacking.bishop(board, new Positon(rank.getKey(), i)));
+
+    // } else if (currentPiece.getName() == PIECES.QUEEN) {
+
+    // allPositons.addAll(attacking.queen(board, new Positon(rank.getKey(), i)));
+
+    // } else if (currentPiece.getName() == PIECES.KING) {
+
+    // allPositons.addAll(attacking.king(board, new Positon(rank.getKey(), i)));
+
+    // }
+    // }
+    // }
+    // }
+    // return allPositons;
+    // }
+
+    public static AttackingInfo getAllAttackingPositions(Board board) throws InvalidPosition {
+        Set<Positon> whiteAttacking = new HashSet<>();
+        Set<Positon> blackAttacking = new HashSet<>();
 
         Attacking attacking = new Attacking();
-
-        Set<Positon> allPositons = new HashSet<>();
 
         for (Map.Entry<Integer, List<Square>> rank : board.getMap().entrySet()) {
 
@@ -231,36 +313,48 @@ public class Attacking {
             for (int i = 0; i < currentRank.size(); i++) {
                 Piece currentPiece = currentRank.get(i).getPiece();
 
-                if (currentPiece != null && currentPiece.getColor() == color) {
-
+                if (currentPiece != null) {
                     if (currentPiece.getName() == PIECES.PAWN) {
-
-                        allPositons.addAll(attacking.pawn(board, new Positon(rank.getKey(), i)));
-
+                        if (currentPiece.getColor() == COLORS.WHITE) {
+                            whiteAttacking.addAll(attacking.pawn(board, new Positon(rank.getKey(), i)));
+                        } else {
+                            blackAttacking.addAll(attacking.pawn(board, new Positon(rank.getKey(), i)));
+                        }
                     } else if (currentPiece.getName() == PIECES.ROOK) {
-
-                        allPositons.addAll(attacking.rook(board, new Positon(rank.getKey(), i)));
-
+                        if (currentPiece.getColor() == COLORS.WHITE) {
+                            whiteAttacking.addAll(attacking.rook(board, new Positon(rank.getKey(), i)));
+                        } else {
+                            blackAttacking.addAll(attacking.rook(board, new Positon(rank.getKey(), i)));
+                        }
                     } else if (currentPiece.getName() == PIECES.KNIGHT) {
-
-                        allPositons.addAll(attacking.knight(board, new Positon(rank.getKey(), i)));
-
+                        if (currentPiece.getColor() == COLORS.WHITE) {
+                            whiteAttacking.addAll(attacking.knight(board, new Positon(rank.getKey(), i)));
+                        } else {
+                            blackAttacking.addAll(attacking.knight(board, new Positon(rank.getKey(), i)));
+                        }
                     } else if (currentPiece.getName() == PIECES.BISHOP) {
-
-                        allPositons.addAll(attacking.bishop(board, new Positon(rank.getKey(), i)));
-
+                        if (currentPiece.getColor() == COLORS.WHITE) {
+                            whiteAttacking.addAll(attacking.bishop(board, new Positon(rank.getKey(), i)));
+                        } else {
+                            blackAttacking.addAll(attacking.bishop(board, new Positon(rank.getKey(), i)));
+                        }
                     } else if (currentPiece.getName() == PIECES.QUEEN) {
-
-                        allPositons.addAll(attacking.queen(board, new Positon(rank.getKey(), i)));
-
+                        if (currentPiece.getColor() == COLORS.WHITE) {
+                            whiteAttacking.addAll(attacking.queen(board, new Positon(rank.getKey(), i)));
+                        } else {
+                            blackAttacking.addAll(attacking.queen(board, new Positon(rank.getKey(), i)));
+                        }
                     } else if (currentPiece.getName() == PIECES.KING) {
-
-                        allPositons.addAll(attacking.king(board, new Positon(rank.getKey(), i)));
-
+                        if (currentPiece.getColor() == COLORS.WHITE) {
+                            whiteAttacking.addAll(attacking.king(board, new Positon(rank.getKey(), i)));
+                        } else {
+                            blackAttacking.addAll(attacking.king(board, new Positon(rank.getKey(), i)));
+                        }
                     }
                 }
             }
         }
-        return allPositons;
+
+        return new AttackingInfo(whiteAttacking, blackAttacking);
     }
 }

@@ -121,13 +121,16 @@ public class Utils {
         return validMoves;
     }
 
-    public static List<Positon> validKingMoves(Board board, Positon positon) throws InvalidPosition {
+    public static List<Positon> validKingMoves(Board board, Positon positon)
+            throws InvalidPosition {
         positon.validate();
         Piece king = board.getPiece(positon);
         List<Positon> validMoves = new ArrayList<>();
 
-        Set<Positon> enemyAttacking = Attacking.getAllAttackingPositions(board,
-                king.getColor() == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+        AttackingInfo attackingInfo = Attacking.getAllAttackingPositions(board);
+
+        Set<Positon> enemyAttacking = king.getColor() == COLORS.WHITE ? attackingInfo.blackAttacking
+                : attackingInfo.whiteAttacking;
 
         // top left square
         if (positon.getRank() < Board.CHESS_CONSTANT && positon.getIndex() > 0) {
@@ -254,7 +257,7 @@ public class Utils {
         return validMoves;
     }
 
-    public static boolean isChekmate(Board board, COLORS color, Positon kingPositon)
+    public static boolean isChekmate(Board board, COLORS color, Positon kingPositon, AttackingInfo attackingInfo)
             throws InvalidPosition, IllegalMove {
         // find the piece that have given chek
 
@@ -269,7 +272,8 @@ public class Utils {
 
         System.out.println(kingValidPositons);
 
-        Set<Positon> currentAttackings = Attacking.getAllAttackingPositions(board, color);
+        Set<Positon> currentAttackings = color == COLORS.WHITE ? attackingInfo.whiteAttacking
+                : attackingInfo.blackAttacking;
 
         if (checkingPositions.isEmpty()) {
             System.out.println("King is not in chek !!");
@@ -524,8 +528,9 @@ public class Utils {
 
                         if (canComeBetween) {
                             board.move(board, new Positon(rank.getKey(), i), pawnPositon);
-                            Set<Positon> opponentAttacking = Attacking.getAllAttackingPositions(board,
-                                    color == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+                            AttackingInfo newattackingInfo = Attacking.getAllAttackingPositions(board);
+                            Set<Positon> opponentAttacking = color == COLORS.WHITE ? newattackingInfo.blackAttacking
+                                    : newattackingInfo.whiteAttacking;
 
                             if (!opponentAttacking.contains(kingPositon)) {
                                 positons.add(new Positon(rank.getKey(), i));
@@ -550,8 +555,9 @@ public class Utils {
 
                         if (canComeBetween) {
                             board.move(board, new Positon(rank.getKey(), i), rookPositon);
-                            Set<Positon> opponentAttacking = Attacking.getAllAttackingPositions(board,
-                                    color == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+                            AttackingInfo newattackingInfo = Attacking.getAllAttackingPositions(board);
+                            Set<Positon> opponentAttacking = color == COLORS.WHITE ? newattackingInfo.blackAttacking
+                                    : newattackingInfo.whiteAttacking;
 
                             if (!opponentAttacking.contains(kingPositon)) {
                                 positons.add(new Positon(rank.getKey(), i));
@@ -574,8 +580,9 @@ public class Utils {
 
                         if (canComeBetween) {
                             board.move(board, new Positon(rank.getKey(), i), bishopPositon);
-                            Set<Positon> opponentAttacking = Attacking.getAllAttackingPositions(board,
-                                    color == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+                            AttackingInfo newattackingInfo = Attacking.getAllAttackingPositions(board);
+                            Set<Positon> opponentAttacking = color == COLORS.WHITE ? newattackingInfo.blackAttacking
+                                    : newattackingInfo.whiteAttacking;
 
                             if (!opponentAttacking.contains(kingPositon)) {
                                 positons.add(new Positon(rank.getKey(), i));
@@ -598,8 +605,9 @@ public class Utils {
 
                         if (canComeBetween) {
                             board.move(board, new Positon(rank.getKey(), i), knightPositon);
-                            Set<Positon> opponentAttacking = Attacking.getAllAttackingPositions(board,
-                                    color == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+                            AttackingInfo newattackingInfo = Attacking.getAllAttackingPositions(board);
+                            Set<Positon> opponentAttacking = color == COLORS.WHITE ? newattackingInfo.blackAttacking
+                                    : newattackingInfo.whiteAttacking;
 
                             if (!opponentAttacking.contains(kingPositon)) {
                                 positons.add(new Positon(rank.getKey(), i));
@@ -622,8 +630,9 @@ public class Utils {
 
                         if (canComeBetween) {
                             board.move(board, new Positon(rank.getKey(), i), queenPositon);
-                            Set<Positon> opponentAttacking = Attacking.getAllAttackingPositions(board,
-                                    color == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE);
+                            AttackingInfo newattackingInfo = Attacking.getAllAttackingPositions(board);
+                            Set<Positon> opponentAttacking = color == COLORS.WHITE ? newattackingInfo.blackAttacking
+                                    : newattackingInfo.whiteAttacking;
 
                             if (!opponentAttacking.contains(kingPositon)) {
                                 positons.add(new Positon(rank.getKey(), i));
