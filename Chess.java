@@ -22,6 +22,7 @@ public class Chess {
     private Positon blackKingPositon;
     private boolean isWhiteKingInCheck;
     private boolean isBlackKingInCheck;
+    public static PrevMove prevMove = new PrevMove(null, null);
 
     public Chess() throws InvalidPosition {
         this.board = new Board();
@@ -29,10 +30,6 @@ public class Chess {
         this.scanner = new Scanner(System.in);
         this.turn = COLORS.WHITE;
         this.gameOver = false;
-        // this.whiteAttacking = Attacking.getAllAttackingPositions(board,
-        // COLORS.WHITE);
-        // this.blackAttacking = Attacking.getAllAttackingPositions(board,
-        // COLORS.BLACK);
         AttackingInfo attackingInfo = Attacking.getAllAttackingPositions(board);
         this.whiteAttacking = attackingInfo.whiteAttacking;
         this.blackAttacking = attackingInfo.blackAttacking;
@@ -77,7 +74,7 @@ public class Chess {
                         continue;
                     }
 
-                    if(this.gameOver){
+                    if (this.gameOver) {
                         System.out.println("Black Won !!");
                         break;
                     }
@@ -94,7 +91,7 @@ public class Chess {
                         continue;
                     }
 
-                    if(this.gameOver){
+                    if (this.gameOver) {
                         System.out.println("White Won !!");
                         break;
                     }
@@ -157,7 +154,7 @@ public class Chess {
                 System.out.println(e.getMessage());
             }
 
-            // checking pinned piece moved or not ?
+            // checking pinned piece moved or Illegal move?
             try {
                 if (this.turn == COLORS.WHITE) {
                     if (this.blackAttacking.contains(this.whiteKingPosition)) {
@@ -212,6 +209,9 @@ public class Chess {
                 System.out.println(e.getMessage());
                 continue;
             }
+
+            Chess.prevMove.setTo(next);
+            Chess.prevMove.setPiece(pieceOnSquare.getName());
 
             this.turn = this.turn == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
         }

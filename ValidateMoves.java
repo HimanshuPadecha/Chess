@@ -68,9 +68,12 @@ public class ValidateMoves {
                 if (from.getRank() != (pawn.getColor() == COLORS.WHITE ? 5 : 4)
                         || board.getPiece(new Positon(from.getRank(), to.getIndex()))
                                 .getColor() != (pawn.getColor() == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE)
-                        || board.getPiece(new Positon(from.getRank(), to.getIndex())).getName() != PIECES.PAWN) {
-                    throw new IllegalMove("En passent is only possible on "
-                            + (pawn.getColor() == COLORS.WHITE ? "fifth " : "forth ") + "rank !!"); // done
+                        || board.getPiece(new Positon(from.getRank(), to.getIndex())).getName() != PIECES.PAWN ||
+                        Chess.prevMove.getTo() != new Positon(from.getRank(), to.getIndex()) ||
+                        Chess.prevMove.getPiece() != PIECES.PAWN) {
+
+                    throw new IllegalMove("Illegal en passent !!"); // done
+
                 }
             }
         }
@@ -80,6 +83,7 @@ public class ValidateMoves {
                 && board.getPiece(new Positon(from.getRank(), to.getIndex()))
                         .getColor() == (pawn.getColor() == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE)
                 && board.getPiece(new Positon(from.getRank(), to.getIndex())).getName() == PIECES.PAWN) {
+
             board.getMap().get(from.getRank()).get(to.getIndex()).setPiece(null);// done
         }
     }

@@ -92,8 +92,9 @@ public class Board {
         from.validate();
         to.validate();
 
+        
         ValidateMoves.validate(board, from, to);
-
+        
         Piece piece = this.getPiece(from);
         this.board.get(from.getRank()).get(from.getIndex()).setPiece(null);
         this.board.get(to.getRank()).get(to.getIndex()).setPiece(piece); 
