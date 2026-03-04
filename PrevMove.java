@@ -7,7 +7,6 @@ public class PrevMove {
         this.to = to;
     }
 
-
     public void setTo(Positon to){
         this.to = to;
     }

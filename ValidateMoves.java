@@ -369,6 +369,5 @@ public class ValidateMoves {
         } else if (piece.getName() == PIECES.KING) {
             validateMoves.king(board, from, to);
         }
-
     }
 }

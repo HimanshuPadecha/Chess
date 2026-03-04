@@ -10,6 +10,10 @@ public class Board {
     static final int BLACK_PAWN_RANK = 7;
     private static final int WHITE_MAJOR_PIECE_RANK = 1;
     private static final int BLACK_MAJOR_PIECE_RANK = Board.CHESS_CONSTANT;
+    public static boolean whiteKingSideCastlePossible = true;
+    public static boolean whiteQueenSideCasltePossible = true;
+    public static boolean blackKingSideCastlePossible = true;
+    public static boolean blackQueenSideCastlePossible = true;
 
     public Board() {
         this.board = new HashMap<>();
@@ -92,12 +96,11 @@ public class Board {
         from.validate();
         to.validate();
 
-        
         ValidateMoves.validate(board, from, to);
-        
+
         Piece piece = this.getPiece(from);
         this.board.get(from.getRank()).get(from.getIndex()).setPiece(null);
-        this.board.get(to.getRank()).get(to.getIndex()).setPiece(piece); 
+        this.board.get(to.getRank()).get(to.getIndex()).setPiece(piece);
 
         if (piece.getName() == PIECES.PAWN) {
             if (piece.getColor() == COLORS.WHITE && to.getRank() == Board.CHESS_CONSTANT) {

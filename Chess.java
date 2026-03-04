@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -135,6 +136,158 @@ public class Chess {
 
             Positon next = Utils.convert(squareToMove);
 
+            // castle logics
+            if (this.turn == COLORS.WHITE && current.equals(Utils.convert("e1")) && next.equals(Utils.convert("g1"))
+                    && pieceOnSquare.getName() == PIECES.KING
+                    && !this.isWhiteKingInCheck && Board.whiteKingSideCastlePossible) {
+                List<Positon> squaresToCheck = Utils.castlingSquares.get(castles.whiteKingSide);
+
+                for (Positon positon : squaresToCheck) {
+                    if (this.board.getPiece(positon) != null) {
+                        System.out.println("Some pieces are in between cannot castle !");
+                        continue;
+                    }
+
+                    if (this.blackAttacking.contains(positon)) {
+                        System.out.println("King cannot walk through chek while getting castled");
+                        continue;
+                    }
+                }
+
+                // king move
+                board.informalMove(current, next);
+                // rook move
+                board.informalMove(Utils.convert("h1"), Utils.convert("f1"));
+
+                try {
+                    AttackingInfo attackingInfo = Attacking.getAllAttackingPositions(board);
+                    this.whiteAttacking = attackingInfo.whiteAttacking;
+                    this.blackAttacking = attackingInfo.blackAttacking;
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    continue;
+                }
+
+                this.whiteKingPosition = next;
+                Chess.prevMove.setTo(next);
+                Chess.prevMove.setPiece(PIECES.KING);
+
+                this.turn = this.turn == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+                continue;
+
+            } else if (this.turn == COLORS.WHITE && current.equals(Utils.convert("e1"))
+                    && next.equals(Utils.convert("c1")) && pieceOnSquare.getName() == PIECES.KING
+                    && !this.isWhiteKingInCheck && Board.whiteQueenSideCasltePossible) {
+                List<Positon> squaresToCheck = Utils.castlingSquares.get(castles.whiteQueenSide);
+
+                for (Positon positon : squaresToCheck) {
+                    if (this.board.getPiece(positon) != null) {
+                        System.out.println("Some pieces are in between cannot castle !");
+                        continue;
+                    }
+
+                    if (this.blackAttacking.contains(positon)) {
+                        System.out.println("King cannot walk through chek while getting castled !!");
+                        continue;
+                    }
+                }
+
+                // king move
+                board.informalMove(current, next);
+                // rook move
+                board.informalMove(Utils.convert("a1"), Utils.convert("d1"));
+
+                try {
+                    AttackingInfo attackingInfo = Attacking.getAllAttackingPositions(board);
+                    this.whiteAttacking = attackingInfo.whiteAttacking;
+                    this.blackAttacking = attackingInfo.blackAttacking;
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    continue;
+                }
+
+                this.whiteKingPosition = next;
+                Chess.prevMove.setTo(next);
+                Chess.prevMove.setPiece(PIECES.KING);
+
+                this.turn = this.turn == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+                continue;
+            } else if (this.turn == COLORS.BLACK && current.equals(Utils.convert("e8"))
+                    && next.equals(Utils.convert("g8")) && pieceOnSquare.getName() == PIECES.KING
+                    && !this.isBlackKingInCheck && Board.blackKingSideCastlePossible) {
+                List<Positon> squaresToCheck = Utils.castlingSquares.get(castles.blackKingSide);
+
+                for (Positon positon : squaresToCheck) {
+                    if (this.board.getPiece(positon) != null) {
+                        System.out.println("Some pieces are in between cannot castle !");
+                        continue;
+                    }
+
+                    if (this.whiteAttacking.contains(positon)) {
+                        System.out.println("King cannot walk through chek while getting castled !!");
+                        continue;
+                    }
+                }
+
+                // king move
+                board.informalMove(current, next);
+                // rook move
+                board.informalMove(Utils.convert("h8"), Utils.convert("f8"));
+
+                try {
+                    AttackingInfo attackingInfo = Attacking.getAllAttackingPositions(board);
+                    this.whiteAttacking = attackingInfo.whiteAttacking;
+                    this.blackAttacking = attackingInfo.blackAttacking;
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    continue;
+                }
+
+                this.blackKingPositon = next;
+                Chess.prevMove.setTo(next);
+                Chess.prevMove.setPiece(PIECES.KING);
+
+                this.turn = this.turn == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+                continue;
+            } else if (this.turn == COLORS.BLACK && current.equals(Utils.convert("e8"))
+                    && next.equals(Utils.convert("c8")) && pieceOnSquare.getName() == PIECES.KING
+                    && !this.isBlackKingInCheck && Board.blackQueenSideCastlePossible) {
+                List<Positon> squaresToCheck = Utils.castlingSquares.get(castles.blackQueenSide);
+
+                for (Positon positon : squaresToCheck) {
+                    if (this.board.getPiece(positon) != null) {
+                        System.out.println("Some pieces are in between cannot castle !");
+                        continue;
+                    }
+
+                    if (this.whiteAttacking.contains(positon)) {
+                        System.out.println("King cannot walk through chek while getting castled !!");
+                        continue;
+                    }
+                }
+
+                // king move
+                board.informalMove(current, next);
+                // rook move
+                board.informalMove(Utils.convert("a8"), Utils.convert("d8"));
+
+                try {
+                    AttackingInfo attackingInfo = Attacking.getAllAttackingPositions(board);
+                    this.whiteAttacking = attackingInfo.whiteAttacking;
+                    this.blackAttacking = attackingInfo.blackAttacking;
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                    continue;
+                }
+
+                this.blackKingPositon = next;
+                Chess.prevMove.setTo(next);
+                Chess.prevMove.setPiece(PIECES.KING);
+
+                this.turn = this.turn == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
+                continue;
+            }
+
             try {
                 this.board.move(board, current, next);
             } catch (Exception e) {
@@ -180,8 +333,12 @@ public class Chess {
             if (pieceOnSquare.getName() == PIECES.KING) {
                 if (this.turn == COLORS.WHITE) {
                     this.whiteKingPosition = next;
+                    Board.whiteKingSideCastlePossible = false;
+                    Board.whiteQueenSideCasltePossible = false;
                 } else {
                     this.blackKingPositon = next;
+                    Board.blackKingSideCastlePossible = false;
+                    Board.blackQueenSideCastlePossible = false;
                 }
             }
 
@@ -212,6 +369,20 @@ public class Chess {
 
             Chess.prevMove.setTo(next);
             Chess.prevMove.setPiece(pieceOnSquare.getName());
+
+            if (current.equals(Utils.convert("h1")) && this.board.getPiece(next).getName() == PIECES.ROOK
+                    && this.board.getPiece(next).getColor() == COLORS.WHITE) {
+                Board.whiteKingSideCastlePossible = false;
+            } else if (current.equals(Utils.convert("a1")) && this.board.getPiece(next).getName() == PIECES.ROOK
+                    && this.board.getPiece(next).getColor() == COLORS.WHITE) {
+                Board.whiteQueenSideCasltePossible = false;
+            } else if (current.equals(Utils.convert("h8")) && this.board.getPiece(next).getName() == PIECES.ROOK
+                    && this.board.getPiece(next).getColor() == COLORS.BLACK) {
+                Board.blackKingSideCastlePossible = false;
+            } else if (current.equals(Utils.convert("a8")) && this.board.getPiece(next).getName() == PIECES.ROOK
+                    && this.board.getPiece(next).getColor() == COLORS.BLACK) {
+                Board.blackQueenSideCastlePossible = false;
+            }
 
             this.turn = this.turn == COLORS.WHITE ? COLORS.BLACK : COLORS.WHITE;
         }

@@ -4,9 +4,13 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+enum castles {
+    whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide
+}
+
 public class Utils {
 
-    static Map<Integer, Character> indicesTofiles = Map.of(
+    final static Map<Integer, Character> indicesTofiles = Map.of(
             0, 'a',
             1, 'b',
             2, 'c',
@@ -15,6 +19,13 @@ public class Utils {
             5, 'f',
             6, 'g',
             7, 'h');
+
+    final static Map<castles, List<Positon>> castlingSquares = Map.of(
+            castles.whiteKingSide, List.of(Utils.convert("f1"), Utils.convert("g1")),
+            castles.whiteQueenSide, List.of(Utils.convert("d1"), Utils.convert("c1"), Utils.convert("b1")),
+
+            castles.blackKingSide, List.of(Utils.convert("f8"), Utils.convert("g8")),
+            castles.blackQueenSide, List.of(Utils.convert("d8"), Utils.convert("c8"), Utils.convert("b8")));
 
     public static Positon convert(String squareName) {
         return new Positon(squareName.charAt(1) - '0', Chess.filesToIndices.get(squareName.charAt(0)));
