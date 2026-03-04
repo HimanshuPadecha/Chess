@@ -292,8 +292,8 @@ public class Utils {
 
         if (checkingPositions.size() == 1) {
 
-            if (board.getPiece(checkFrom).getName() == PIECES.PAWN
-                    || board.getPiece(checkFrom).getName() == PIECES.KNIGHT && kingValidPositons.isEmpty()
+            if ((board.getPiece(checkFrom).getName() == PIECES.PAWN
+            || board.getPiece(checkFrom).getName() == PIECES.KNIGHT) && kingValidPositons.isEmpty()
                             && !currentAttackings.contains(checkFrom)) {
                 return true;
 
