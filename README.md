@@ -68,4 +68,4 @@ Board
 
 ## 🧮 Some Algorithms
 
-Kindly check this PDF: 📄 [Detailed Algorithms](https://docs.google.com/viewer?url=https://raw.githubusercontent.com/HimanshuPadecha/Chess/main/algorithms.pdf)
+Kindly check this PDF: 📄 [Detailed Algorithms](https://raw.githubusercontent.com/HimanshuPadecha/Chess/main/algorithms.pdf)
